@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="default_ride_saidas">
+        <item>Rua Boa Viagem,Aracaju</item>
+        <item>Av Barão de Maruim,Aracaju </item>
+        <item>Rua Itabaininha,Aracaju</item>
+        <item>Av Acrísio Cruz,Aracaju</item>
+    </string-array>
+    <string-array name="default_ride_destinos">
+        <item>Av Marechal Rondom,Aracaju</item>
+        <item>Rua Boa Viagem,Aracaju</item>
+        <item>Shopping Jardins,Aracaju</item>
+        <item>Av João Ribeiro, Aracaju</item>
+    </string-array>
+</resources>

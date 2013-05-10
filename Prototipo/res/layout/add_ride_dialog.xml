@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayoutAddRide"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/black" >
+    
+    <TextView android:layout_width="match_parent"
+      android:layout_height="wrap_content" 
+      android:text="@string/saida"
+      android:textColor="@android:color/white" android:gravity="center"/>
+	<EditText android:id="@+id/add_ride_saida_edit_text" 
+      android:layout_width="400dp" android:layout_height="wrap_content"
+      android:inputType="text"
+      android:textColor="@color/white"/>
+	 <TextView android:layout_width="fill_parent"
+      android:layout_height="wrap_content" 
+      android:text="@string/destino"
+      android:textColor="@android:color/white" android:gravity="center"/>
+	 <EditText android:id="@+id/add_ride_destino_edit_text" 
+      android:layout_width="400dp" android:layout_height="wrap_content"
+      android:inputType="text"
+      android:textColor="@color/white"/>
+	<Button android:id="@+id/add_ride_button" 
+      android:layout_width="match_parent" 
+      android:layout_height="wrap_content" 
+      android:text="@string/add"
+      android:background="@color/gray" />
+</LinearLayout>
