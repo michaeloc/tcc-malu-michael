@@ -24,8 +24,11 @@
             android:layout_gravity="center"
             android:layout_span="1"
             android:text="Michael Oliveira" />
-
-    </TableRow>
+	</TableRow>
+	
+    <FrameLayout android:layout_width="match_parent"
+		    android:layout_height="5dp"
+		    android:background="@color/black"/>
 
     <TableRow
         android:id="@+id/tableRow2"
@@ -45,7 +48,9 @@
             android:text=" " />
 
     </TableRow>
-
+ 	<FrameLayout android:layout_width="match_parent"
+		    android:layout_height="5dp"
+		    android:background="@color/black"/>
     <TableRow
         android:id="@+id/tableRow3"
         android:layout_width="wrap_content"
@@ -68,7 +73,7 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="" />
+            android:text="TextView" />
 
     </TableRow>
 
