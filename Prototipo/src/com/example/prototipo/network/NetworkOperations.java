@@ -69,7 +69,34 @@ public static final String MAIN_URL = "http://10.0.2.2/elgg/";
 	    }
 	    return false;
 	}
+	public String downloadRides()
+	{
+		String body = null;
+		HttpGet httpget = null;
+		HttpResponse response;
+		HttpEntity entity;
+		
+		try {
+			redirectStrategy();
+        	
+        	httpget = new HttpGet(MAIN_URL+"rota/searchRota");
+        	
+        	response = httpclient.execute(httpget);// executa uma requisição
+        	
+            entity = response.getEntity();
+            
+            body = EntityUtils.toString(entity);
+        	 
+		 }
+        catch (ClientProtocolException e) {
+            Log.d("[Jin]", e.getMessage(),e);
+        }
+        catch (IOException e) {
+            Log.d("[Jin]", e.getMessage(),e);
+        }
 	
+		return body;
+	}
 	public boolean doLogin(){
 
 		if(isOnline())
@@ -190,6 +217,28 @@ public static final String MAIN_URL = "http://10.0.2.2/elgg/";
         			return true;
         }
 		return false;
+	}
+	
+	private void redirectStrategy()
+	{
+		httpclient.setRedirectStrategy(new DefaultRedirectStrategy() {                
+            public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context)  {
+                boolean isRedirect=false;
+                try {
+                    isRedirect = super.isRedirected(request, response, context);
+                } catch (ProtocolException e) {
+                    e.printStackTrace();
+                }
+                if (!isRedirect) {
+                    int responseCode = response.getStatusLine().getStatusCode();
+                    if (responseCode == 301 || responseCode == 302) {
+                        return true;
+                    }
+                }
+                return isRedirect;
+            }
+        });
+		
 	}
 	
 }

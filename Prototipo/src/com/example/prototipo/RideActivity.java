@@ -1,7 +1,10 @@
 package com.example.prototipo;
 
+import java.util.ArrayList;
+
 import com.example.prototipo.AddRideDialogFragment.DialogFinishedListener;
 import com.example.prototipo.MainActivity.Conectar;
+import com.example.prototipo.network.NetworkOperations;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +22,7 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.SlidingDrawer;
 import android.widget.Toast;
 
 public class RideActivity extends Activity implements DialogFinishedListener {
@@ -26,6 +30,10 @@ public class RideActivity extends Activity implements DialogFinishedListener {
 	private ListRide listRideFragments;
 	private static final int CURRENT_CONDITIONS_TAB = 1;
 	private static final String CURRENT_TAB_KEY = "current_tab";
+	private String rotas;
+	private ArrayList<String> splitRotas;
+	private NetworkOperations netOp = NetworkOperations.getNetworkOperations(this);
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -34,8 +42,7 @@ public class RideActivity extends Activity implements DialogFinishedListener {
 		setupTabs();
 		
 	}
-
-	@Override
+	@Override 
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		super.onCreateOptionsMenu(menu);
@@ -58,7 +65,16 @@ public class RideActivity extends Activity implements DialogFinishedListener {
 	public void onResume()
 	{
 		super.onResume();
-				
+		download();
+		listRideFragments = ListRide.newInstance(splitRotas);
+		selectFragment(listRideFragments);
+	}
+	private void selectFragment(Fragment fragment)
+	{
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+		ft.replace(R.id.replace, fragment);
+		ft.commit();
 	}
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceStateBundle){
@@ -70,15 +86,12 @@ public class RideActivity extends Activity implements DialogFinishedListener {
 		super.onRestoreInstanceState(savedInstanceStadeBundle);
 		currentTab = savedInstanceStadeBundle.getInt(CURRENT_TAB_KEY);
 	}
-	//Ainda não defini a inserção de rotas
+	
 	private void showAddRideDialog()
 	{
 		AddRideDialogFragment newAddRideDialogFragment = new AddRideDialogFragment();
-		
 		FragmentManager thisFragmentManager = getFragmentManager();
-		
 		FragmentTransaction addRideFragmentTransaction = thisFragmentManager.beginTransaction();
-		
 		newAddRideDialogFragment.show(addRideFragmentTransaction, "");
 	}
 	
@@ -98,38 +111,29 @@ public class RideActivity extends Activity implements DialogFinishedListener {
 		
 		allRide.setText(getResources().getString(R.string.allRide));
 		allRide.setTabListener(rideTabListener);
-		rideBar.addTab(allRide);
-		
-		rideBar.selectTab(allRide);
-		
+		rideBar.addTab(allRide,true);
+					
 		currentTab = CURRENT_CONDITIONS_TAB;
-		
+				
+	}
+	private void download(){
+		DownloadRide download = new DownloadRide(this);
+		download.execute();
 	}
 	private void selectTab(int position)
 	{
 		currentTab =  position;
-		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-		if(listRideFragments==null)
+		download();
+		if(currentTab == CURRENT_CONDITIONS_TAB )
 		{
-			listRideFragments = ListRide.newInstance();
-			ft.replace(R.id.replace, listRideFragments);
-			
-		}else{
-			
-			if(currentTab == CURRENT_CONDITIONS_TAB )
-			{
-				listRideFragments = ListRide.newInstance();
-				ft.replace(R.id.replace, listRideFragments);
+			listRideFragments = ListRide.newInstance(splitRotas);
+			selectFragment(listRideFragments);
 							
-			}else{
-				
-				Profile p = Profile.newInstance();
-				ft.replace(R.id.replace, p);
-				
-			}
+		}else{
+
+			Profile profile = Profile.newInstance();
+			selectFragment(profile);
 		}
-		ft.commit();
 	}
 	
 	TabListener rideTabListener = new TabListener()
@@ -138,7 +142,6 @@ public class RideActivity extends Activity implements DialogFinishedListener {
 		@Override
 		public void onTabReselected(Tab tab, FragmentTransaction ft) {
 			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
@@ -150,7 +153,6 @@ public class RideActivity extends Activity implements DialogFinishedListener {
 		@Override
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 			// TODO Auto-generated method stub
-			
 		}
 		
 		
@@ -161,6 +163,91 @@ public class RideActivity extends Activity implements DialogFinishedListener {
 		
 	}
 	
-	
+	public String [] splitRoute(String rotas)
+	{
+		String []listRide;
+		return listRide = rotas.split("#");
+		
+	}
+	public ArrayList<String>getSaida(String [] rides)
+	{
+		ArrayList<String> saidas = new ArrayList<String>();
+		
+		for(int i = 0; i < rides.length; i++)
+		{
+			if(i % 2 == 0)
+			{
+				saidas.add(rides[i]);
+			}
+		}
+		return saidas;
+	}
+	public ArrayList<String>getDestino(String [] rides)
+	{
+		ArrayList<String> destinos = new ArrayList<String>();
+		for(int i = 0; i < rides.length; i++)
+		{
+			if(i % 2 != 0)
+			{
+				destinos.add(rides[i]);
+			}
+		}
+		return destinos;
+		
+	}
+		
+	public class DownloadRide extends AsyncTask<Void,Void,Boolean>{
+    	
+    	final ProgressDialog dialog = new ProgressDialog(RideActivity.this);
+    	
+    	Context mcontext;
+    	
+    	DownloadRide(Context context){
+    		mcontext = context;
+    	}
+    	
+    	@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			dialog.setMessage("Loading...");
+		    dialog.show();
+		}
 
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			
+			rotas = netOp.downloadRides();
+			splitRotas=getSaida(splitRoute(rotas));
+			//addRide();
+			System.out.println(rotas);
+			if(rotas == null)
+				return false;
+			
+			return true;
+						
+		}
+		
+		 protected void onPostExecute(Boolean respuesta) {
+			 if (respuesta == true)
+			 {
+				 //getActivity().finish();
+				 
+				 dialog.dismiss();
+				 
+				 //Toast.makeText(getActivity(), "User successfully registered",  Toast.LENGTH_SHORT).show();
+		        						 
+				 //mcontext.startActivity(j);
+				 
+			 }
+			 else{
+				 
+				// Toast.makeText(MainActivity.this, "Registration failure",  Toast.LENGTH_SHORT).show();
+				 
+				 dialog.dismiss();
+			 }
+					 
+		}
+    
+    }
+	
 }
