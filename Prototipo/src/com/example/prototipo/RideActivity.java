@@ -26,19 +26,21 @@ import android.widget.SlidingDrawer;
 import android.widget.Toast;
 
 public class RideActivity extends Activity implements DialogFinishedListener {
-	private int currentTab;
+	private int currentTab ;
 	private ListRide listRideFragments;
 	private static final int CURRENT_CONDITIONS_TAB = 1;
 	private static final String CURRENT_TAB_KEY = "current_tab";
-	private String rotas;
-	private ArrayList<String> splitRotas;
+	private String download;
+	private ArrayList<String> profile;
+	private ArrayList<String> rotaSaida;
+	private ArrayList<String> rotaDestino;
 	private NetworkOperations netOp = NetworkOperations.getNetworkOperations(this);
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.ride);
-		listRideFragments = (ListRide)getFragmentManager().findFragmentById(R.id.replace);
+		//listRideFragments = (ListRide)getFragmentManager().findFragmentById(R.id.replace);
 		setupTabs();
 		
 	}
@@ -66,14 +68,14 @@ public class RideActivity extends Activity implements DialogFinishedListener {
 	{
 		super.onResume();
 		download();
-		listRideFragments = ListRide.newInstance(splitRotas);
-		selectFragment(listRideFragments);
+		listRideFragments = ListRide.newInstance(rotaSaida,rotaDestino);
+		changeFragment(listRideFragments);
 	}
-	private void selectFragment(Fragment fragment)
+	private void changeFragment(Fragment listRideFragments2)
 	{
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
 		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-		ft.replace(R.id.replace, fragment);
+		ft.replace(R.id.replace, listRideFragments2);
 		ft.commit();
 	}
 	@Override
@@ -126,13 +128,13 @@ public class RideActivity extends Activity implements DialogFinishedListener {
 		download();
 		if(currentTab == CURRENT_CONDITIONS_TAB )
 		{
-			listRideFragments = ListRide.newInstance(splitRotas);
-			selectFragment(listRideFragments);
+			listRideFragments = ListRide.newInstance(rotaSaida,rotaDestino);
+			changeFragment(listRideFragments);
 							
 		}else{
-
+			
 			Profile profile = Profile.newInstance();
-			selectFragment(profile);
+			changeFragment(profile);
 		}
 	}
 	
@@ -216,11 +218,16 @@ public class RideActivity extends Activity implements DialogFinishedListener {
 		@Override
 		protected Boolean doInBackground(Void... params) {
 			
-			rotas = netOp.downloadRides();
-			splitRotas=getSaida(splitRoute(rotas));
-			//addRide();
-			System.out.println(rotas);
-			if(rotas == null)
+			if(currentTab == 0){
+				download = netOp.downloadData("searchRota");
+				rotaSaida = getSaida(splitRoute(download));
+				rotaDestino = getDestino(splitRoute(download));
+				System.out.println(download);
+			}else{
+				
+				download = netOp.downloadData("profile");
+			}
+			if(download == null)
 				return false;
 			
 			return true;

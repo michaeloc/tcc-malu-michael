@@ -69,7 +69,7 @@ public static final String MAIN_URL = "http://10.0.2.2/elgg/";
 	    }
 	    return false;
 	}
-	public String downloadRides()
+	public String downloadData(String path)
 	{
 		String body = null;
 		HttpGet httpget = null;
@@ -79,7 +79,7 @@ public static final String MAIN_URL = "http://10.0.2.2/elgg/";
 		try {
 			redirectStrategy();
         	
-        	httpget = new HttpGet(MAIN_URL+"rota/searchRota");
+        	httpget = new HttpGet(MAIN_URL+"rota/"+path);
         	
         	response = httpclient.execute(httpget);// executa uma requisição
         	

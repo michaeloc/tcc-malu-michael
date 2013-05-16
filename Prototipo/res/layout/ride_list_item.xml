@@ -4,7 +4,5 @@
    android:layout_height="wrap_content" android:textSize="23sp"
    android:gravity="left|center_vertical" android:padding="10dp"
    android:minHeight="?android:attr/listPreferredItemHeight"
-   android:textColor="@android:color/black"
-   />
-    
+   android:textColor="@android:color/black"/>
 
