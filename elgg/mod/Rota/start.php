@@ -43,6 +43,9 @@ function rota_page_handler($page)
 			break;
 		case 'searchRota':
 			require "$pages_dir/search.php";
+			break;
+		case 'profile':
+			require "$pages_dir/profile.php";
 		default:
 			
 			break;
